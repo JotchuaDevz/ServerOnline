@@ -4,7 +4,6 @@ After=network.target
 
 [Service]
 Type=simple
-# Cambia la clave por una tuya (misma que pones en AppConfig.presenceApiKey())
 ExecStart=/opt/presence-server/presence-server -addr :8090 -apikey PornoRico
 Restart=always
 RestartSec=3
