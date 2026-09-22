@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BINARY_URL_AMD64=""
+BINARY_URL_AMD64="https://raw.githubusercontent.com/JotchuaDevz/ServerOnline/refs/heads/main/presence-server-linux-amd64"
 BINARY_URL_ARM64="https://raw.githubusercontent.com/JotchuaDevz/ServerOnline/refs/heads/main/presence-server-linux-amd64"
 INSTALL_DIR="/opt/presence-server"
 BIN_PATH="$INSTALL_DIR/presence-server"
