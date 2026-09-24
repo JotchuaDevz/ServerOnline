@@ -33,6 +33,22 @@ esac
 
 log "arquitectura detectada: $ARCH_LABEL"
 
+if systemctl list-unit-files 2>/dev/null | grep -q "^presence-server.service"; then
+    log "se detectó una instalación previa de presence-server"
+    if systemctl is-active --quiet presence-server 2>/dev/null; then
+        log "el servicio está corriendo, deteniéndolo antes de reinstalar"
+        systemctl stop presence-server
+    fi
+else
+    log "no se detectó instalación previa, se hará instalación limpia"
+fi
+
+if [ -z "$API_KEY" ]; then
+    if [ -t 0 ]; then
+        read -r -p ">> pega un token/API key (enter para generar uno random): " API_KEY
+    fi
+fi
+
 GENERATED_KEY=false
 if [ -z "$API_KEY" ]; then
     if command -v openssl >/dev/null 2>&1; then
@@ -41,7 +57,9 @@ if [ -z "$API_KEY" ]; then
         API_KEY="$(head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')"
     fi
     GENERATED_KEY=true
-    log "no se pasó PRESENCE_API_KEY, se generó una nueva"
+    log "no se dio token, se generó uno nuevo"
+else
+    log "usando el token proporcionado"
 fi
 
 if ! command -v wget >/dev/null 2>&1; then
@@ -116,11 +134,9 @@ else
     echo "Revisa los logs: journalctl -u presence-server -n 50 --no-pager"
 fi
 
-if [ "$GENERATED_KEY" = true ]; then
-    echo
-    echo "API key generada (guárdala, la necesitas en la app Android):"
-    echo "  $API_KEY"
-fi
+echo
+echo "Token en uso:"
+echo "  $API_KEY"
 
 echo
 echo "Pega esto en AppConfig.kt (app Android):"
@@ -131,4 +147,3 @@ echo "Ver logs en vivo:   journalctl -u presence-server -f"
 echo "Reiniciar:          systemctl restart presence-server"
 echo "Probar desde fuera: curl -H \"X-Api-Key: $API_KEY\" http://TU_IP:$PORT/counts"
 echo "================================================================"
-
